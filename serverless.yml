@@ -1,0 +1,34 @@
+service: helloworld
+
+provider:
+  name: aws
+  stage: dev
+  region: us-west-2
+  runtime: nodejs4.3
+  memorySize: 128
+  timeout: 30
+  profile: ${self:custom.currentVars.profile}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "lambda:InvokeFunction"
+        - 's3:PutObject'
+        - 's3:GetObject'
+      Resource: "*"
+
+plugins:
+  - serverless-webpack
+
+custom: ${file(./serverless.vars.yml)}
+
+functions:
+
+  helloworld:
+    handler: handler.helloworld
+    events: 
+      - http:
+          path: hello
+          method: get
+          cors: ${self:custom.currentVars.cors}
+          integration: lambda
+
